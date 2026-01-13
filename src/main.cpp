@@ -977,16 +977,33 @@ void create_stored_devices_screen() {
   lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
   
-  // Back button - MOVED TO TOP RIGHT
-  lv_obj_t * btnBack = lv_button_create(stored_devices_screen);
-  lv_obj_add_event_cb(btnBack, event_handler_btnBackStored, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnBack, LV_ALIGN_TOP_RIGHT, -10, 10);  // Changed to top right
-  lv_obj_set_size(btnBack, 80, 35);
-  lv_obj_t * lblBack = lv_label_create(btnBack);
-  lv_label_set_text(lblBack, "Back");
-  lv_obj_center(lblBack);
+  // Container for navigation buttons (75x35) at top right - REPLACED back button
+  lv_obj_t * nav_container = lv_obj_create(stored_devices_screen);
+  lv_obj_set_size(nav_container, 75, 35);
+  lv_obj_align(nav_container, LV_ALIGN_TOP_RIGHT, -5, 10);  // Position at top right
+  lv_obj_set_style_border_width(nav_container, 0, LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(nav_container, LV_OPA_TRANSP, LV_PART_MAIN);
+  lv_obj_set_style_pad_all(nav_container, 0, LV_PART_MAIN);
   
-  // Target1 Section - Adjusted Y positions since back button moved
+  // Left button (Back to bluetooth screen) - 35x35
+  lv_obj_t * btnBackToBluetooth = lv_button_create(nav_container);
+  lv_obj_add_event_cb(btnBackToBluetooth, event_handler_btnBackStored, LV_EVENT_CLICKED, NULL);
+  lv_obj_set_size(btnBackToBluetooth, 35, 35);
+  lv_obj_align(btnBackToBluetooth, LV_ALIGN_LEFT_MID, 0, 0);
+  lv_obj_t * lblBackToBluetooth = lv_label_create(btnBackToBluetooth);
+  lv_label_set_text(lblBackToBluetooth, LV_SYMBOL_LEFT);
+  lv_obj_center(lblBackToBluetooth);
+  
+  // Right button (Back to main screen) - 35x35
+  lv_obj_t * btnBackToMain = lv_button_create(nav_container);
+  lv_obj_add_event_cb(btnBackToMain, event_handler_btnBack, LV_EVENT_CLICKED, NULL);
+  lv_obj_set_size(btnBackToMain, 35, 35);
+  lv_obj_align(btnBackToMain, LV_ALIGN_RIGHT_MID, 0, 0);
+  lv_obj_t * lblBackToMain = lv_label_create(btnBackToMain);
+  lv_label_set_text(lblBackToMain, LV_SYMBOL_RIGHT);
+  lv_obj_center(lblBackToMain);
+  
+  // Target1 Section - Adjusted Y positions since navigation container is at top
   lv_obj_t * target1Label = lv_label_create(stored_devices_screen);
   lv_label_set_text(target1Label, "Target1 Device:");
   lv_obj_set_width(target1Label, 200);
@@ -1011,7 +1028,7 @@ void create_stored_devices_screen() {
   // Target1 Connect Button
   lv_obj_t * btnConnectTarget1 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnConnectTarget1, event_handler_btnConnectTarget1, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -10, 60);  // Moved down from 50 to 60
+  lv_obj_align(btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 60);  // Moved down from 50 to 60
   lv_obj_set_size(btnConnectTarget1, 80, 35);
   lv_obj_t * lblConnectTarget1 = lv_label_create(btnConnectTarget1);
   lv_label_set_text(lblConnectTarget1, "Connect");
@@ -1020,7 +1037,7 @@ void create_stored_devices_screen() {
   // Target1 Disconnect Button
   lv_obj_t * btnDisconnectTarget1 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnDisconnectTarget1, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget1, LV_ALIGN_TOP_RIGHT, -10, 100);  // Moved down from 90 to 100
+  lv_obj_align(btnDisconnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 100);  // Moved down from 90 to 100
   lv_obj_set_size(btnDisconnectTarget1, 80, 35);
   lv_obj_t * lblDisconnectTarget1 = lv_label_create(btnDisconnectTarget1);
   lv_label_set_text(lblDisconnectTarget1, "Disconnect");
@@ -1062,7 +1079,7 @@ void create_stored_devices_screen() {
   // Target2 Connect Button
   lv_obj_t * btnConnectTarget2 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnConnectTarget2, event_handler_btnConnectTarget2, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -10, 165);  // Changed from 170 to 165 (moved up 5px)
+  lv_obj_align(btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 165);  // Changed from 170 to 165 (moved up 5px)
   lv_obj_set_size(btnConnectTarget2, 80, 35);
   lv_obj_t * lblConnectTarget2 = lv_label_create(btnConnectTarget2);
   lv_label_set_text(lblConnectTarget2, "Connect");
@@ -1071,7 +1088,7 @@ void create_stored_devices_screen() {
   // Target2 Disconnect Button
   lv_obj_t * btnDisconnectTarget2 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnDisconnectTarget2, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget2, LV_ALIGN_TOP_RIGHT, -10, 205);  // Changed from 210 to 205 (moved up 5px)
+  lv_obj_align(btnDisconnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 205);  // Changed from 210 to 205 (moved up 5px)
   lv_obj_set_size(btnDisconnectTarget2, 80, 35);
   lv_obj_t * lblDisconnectTarget2 = lv_label_create(btnDisconnectTarget2);
   lv_label_set_text(lblDisconnectTarget2, "Disconnect");
@@ -1141,23 +1158,31 @@ void create_bluetooth_screen() {
   lv_label_set_text(lblTarget2, "Target2");
   lv_obj_center(lblTarget2);
   
-  // Stored Devices button - MOVED TO BOTTOM RIGHT
-  lv_obj_t * btnStoredDevices = lv_button_create(bluetooth_screen);
-  lv_obj_add_event_cb(btnStoredDevices, event_handler_btnStoredDevices, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnStoredDevices, LV_ALIGN_BOTTOM_RIGHT, -5, -45);  // Moved to bottom right
-  lv_obj_set_size(btnStoredDevices, 80, 35);
-  lv_obj_t * lblStoredDevices = lv_label_create(btnStoredDevices);
-  lv_label_set_text(lblStoredDevices, "Stored");
-  lv_obj_center(lblStoredDevices);
+  // Container for navigation buttons (75x35) at bottom right
+  lv_obj_t * nav_container = lv_obj_create(bluetooth_screen);
+  lv_obj_set_size(nav_container, 75, 35);
+  lv_obj_align(nav_container, LV_ALIGN_BOTTOM_RIGHT, -5, -5);
+  lv_obj_set_style_border_width(nav_container, 0, LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(nav_container, LV_OPA_TRANSP, LV_PART_MAIN);
+  lv_obj_set_style_pad_all(nav_container, 0, LV_PART_MAIN);
   
-  // Back button - MOVED TO BOTTOM RIGHT (above Stored button)
-  lv_obj_t * btnBack = lv_button_create(bluetooth_screen);
+  // Left button (Back to main screen) - 35x35
+  lv_obj_t * btnBack = lv_button_create(nav_container);
   lv_obj_add_event_cb(btnBack, event_handler_btnBack, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnBack, LV_ALIGN_BOTTOM_RIGHT, -5, -5);  // Moved to bottom right
-  lv_obj_set_size(btnBack, 80, 35);
+  lv_obj_set_size(btnBack, 35, 35);
+  lv_obj_align(btnBack, LV_ALIGN_LEFT_MID, 0, 0);
   lv_obj_t * lblBack = lv_label_create(btnBack);
-  lv_label_set_text(lblBack, "Back");
+  lv_label_set_text(lblBack, LV_SYMBOL_LEFT);
   lv_obj_center(lblBack);
+  
+  // Right button (Go to stored devices) - 35x35
+  lv_obj_t * btnStoredDevices = lv_button_create(nav_container);
+  lv_obj_add_event_cb(btnStoredDevices, event_handler_btnStoredDevices, LV_EVENT_CLICKED, NULL);
+  lv_obj_set_size(btnStoredDevices, 35, 35);
+  lv_obj_align(btnStoredDevices, LV_ALIGN_RIGHT_MID, 0, 0);
+  lv_obj_t * lblStoredDevices = lv_label_create(btnStoredDevices);
+  lv_label_set_text(lblStoredDevices, LV_SYMBOL_RIGHT);
+  lv_obj_center(lblStoredDevices);
 }
 
 // Screen creation - Main Screen
