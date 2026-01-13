@@ -85,9 +85,9 @@ lv_obj_t* target2StatusLabel;  // ADDED: Target2 status label
 #define SERVICE_UUID        "0000FFE0-0000-1000-8000-00805F9B34FB"
 #define CHARACTERISTIC_UUID "0000FFE1-0000-1000-8000-00805F9B34FB"
 
-// Your target device MAC addresses
-#define TARGET_DEVICE_ADDRESS "B4:52:A9:B0:0F:BB"
-#define TARGET2_DEVICE_ADDRESS "00:00:00:00:00:00"  // PLACEHOLDER - Update when available
+// Default MAC addresses (used if nothing is stored in NVS)
+#define DEFAULT_TARGET_DEVICE_ADDRESS "B4:52:A9:B0:0F:BB"
+#define DEFAULT_TARGET2_DEVICE_ADDRESS "00:00:00:00:00:00"
 
 // NVS Preferences
 Preferences preferences;
@@ -174,8 +174,8 @@ void updateStatusIndicator() {
 // ADDED: Load stored MACs from NVS
 void loadStoredMACs() {
   preferences.begin(NVS_NAMESPACE, false);
-  storedTarget1MAC = preferences.getString(TARGET1_MAC_KEY, TARGET_DEVICE_ADDRESS);
-  storedTarget2MAC = preferences.getString(TARGET2_MAC_KEY, TARGET2_DEVICE_ADDRESS);
+  storedTarget1MAC = preferences.getString(TARGET1_MAC_KEY, DEFAULT_TARGET_DEVICE_ADDRESS);
+  storedTarget2MAC = preferences.getString(TARGET2_MAC_KEY, DEFAULT_TARGET2_DEVICE_ADDRESS);
   preferences.end();
   
   Serial.println("=== Loaded Stored MACs from NVS ===");
@@ -237,9 +237,10 @@ void updateStoredDevicesScreen() {
   }
 }
 
-// BLE Callback for discovered devices
+// BLE Callback for discovered devices (updated to just log, not store)
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
   void onResult(BLEAdvertisedDevice advertisedDevice) {
+    // Just log found devices, but don't store them here anymore
     String deviceName = advertisedDevice.getName().c_str();
     if (deviceName.length() == 0) {
       deviceName = "Unknown Device";
@@ -248,27 +249,8 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     String deviceAddress = advertisedDevice.getAddress().toString().c_str();
     int rssi = advertisedDevice.getRSSI();
     
-    // Check if device already in list
-    bool found = false;
-    for (auto& dev : bleDevices) {
-      if (dev.address == deviceAddress) {
-        found = true;
-        break;
-      }
-    }
-    
-    if (!found) {
-      BLEDeviceInfo newDevice;
-      newDevice.name = deviceName;
-      newDevice.address = deviceAddress;
-      newDevice.rssi = rssi;
-      newDevice.isTarget1 = (deviceAddress == storedTarget1MAC);
-      newDevice.isTarget2 = (deviceAddress == storedTarget2MAC);
-      bleDevices.push_back(newDevice);
-      
-      Serial.printf("BLE Found: %s - %s (%d dB)\n", 
-                    deviceName.c_str(), deviceAddress.c_str(), rssi);
-    }
+    Serial.printf("BLE Scanning: %s - %s (%d dB)\n", 
+                  deviceName.c_str(), deviceAddress.c_str(), rssi);
   }
 };
 
@@ -464,28 +446,6 @@ void bleStartScan() {
   bleDevices.clear();
   selectedDeviceIdx = -1;
   
-  // Always add your target devices (in case they're not advertising)
-  BLEDeviceInfo targetDevice;
-  targetDevice.name = "MY TARGET DEVICE";
-  targetDevice.address = storedTarget1MAC;
-  targetDevice.rssi = -60;
-  targetDevice.isTarget1 = true;
-  targetDevice.isTarget2 = false;
-  bleDevices.push_back(targetDevice);
-  Serial.println("Added target device: " + storedTarget1MAC);
-  
-  // Add Target2 if not placeholder
-  if (storedTarget2MAC != "00:00:00:00:00:00") {
-    BLEDeviceInfo target2Device;
-    target2Device.name = "TARGET2 DEVICE";
-    target2Device.address = storedTarget2MAC;
-    target2Device.rssi = -60;
-    target2Device.isTarget1 = false;
-    target2Device.isTarget2 = true;
-    bleDevices.push_back(target2Device);
-    Serial.println("Added target2 device: " + storedTarget2MAC);
-  }
-  
   if (deviceList) {
     lv_obj_clean(deviceList);
     lv_list_add_text(deviceList, "Scanning...");
@@ -506,9 +466,35 @@ void bleStartScan() {
     lv_obj_clean(deviceList);
     lv_list_add_text(deviceList, "Found Devices:");
     
-    if (bleDevices.size() > 0) {
+    if (foundDevices.getCount() > 0) {
+      // First, add all found devices
+      for (int i = 0; i < foundDevices.getCount(); i++) {
+        BLEAdvertisedDevice device = foundDevices.getDevice(i);
+        String deviceName = device.getName().c_str();
+        if (deviceName.length() == 0) {
+          deviceName = "Unknown Device";
+        }
+        
+        String deviceAddress = device.getAddress().toString().c_str();
+        int rssi = device.getRSSI();
+        
+        BLEDeviceInfo newDevice;
+        newDevice.name = deviceName;
+        newDevice.address = deviceAddress;
+        newDevice.rssi = rssi;
+        newDevice.isTarget1 = (deviceAddress == storedTarget1MAC);
+        newDevice.isTarget2 = (deviceAddress == storedTarget2MAC);
+        bleDevices.push_back(newDevice);
+        
+        Serial.printf("BLE Found: %s - %s (%d dB)\n", 
+                      deviceName.c_str(), deviceAddress.c_str(), rssi);
+      }
+      
+      // Now add devices to the list
       for (size_t i = 0; i < bleDevices.size(); i++) {
         String displayText = bleDevices[i].name;
+        
+        // Mark as Target1 or Target2 if they match stored MACs
         if (bleDevices[i].isTarget1) {
           displayText = ">> " + displayText + " (Target1)";
         } else if (bleDevices[i].isTarget2) {
