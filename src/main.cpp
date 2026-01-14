@@ -94,10 +94,14 @@ Preferences preferences;
 #define NVS_NAMESPACE "ble_storage"
 #define TARGET1_MAC_KEY "target1_mac"
 #define TARGET2_MAC_KEY "target2_mac"
+#define AUTOCONNECT_ENABLED_KEY "auto_connect"  // CHANGED: Shortened key name
 
 // Current MAC addresses from NVS
 String storedTarget1MAC = "";
 String storedTarget2MAC = "";
+
+// Auto-connect state
+bool autoConnectEnabled = true;  // ADDED: Default to enabled
 
 // Forward function declarations
 void bleStartScan();
@@ -114,6 +118,8 @@ void touchscreen_read(lv_indev_t * indev, lv_indev_data_t * data);
 void loadStoredMACs();  // ADDED: Load MACs from NVS
 void saveTarget1MAC(const String& mac);  // ADDED: Save Target1 MAC to NVS
 void saveTarget2MAC(const String& mac);  // ADDED: Save Target2 MAC to NVS
+void loadAutoConnectState();  // ADDED: Load auto-connect state from NVS
+void saveAutoConnectState(bool enabled);  // ADDED: Save auto-connect state to NVS
 
 // EVENT HANDLER DECLARATIONS - ADDED THIS
 static void event_handler_btnSet(lv_event_t * e);
@@ -132,6 +138,7 @@ static void event_handler_btnTarget2(lv_event_t * e);  // ADDED: Store as Target
 static void event_handler_btnStoredDevices(lv_event_t * e);  // ADDED: For Stored Devices button
 static void event_handler_btnConnectTarget1(lv_event_t * e);  // ADDED: Connect to Target1
 static void event_handler_btnConnectTarget2(lv_event_t * e);  // ADDED: Connect to Target2
+static void event_handler_autoConnectCheckbox(lv_event_t * e);  // ADDED: For auto-connect checkbox
 
 // Logging
 void log_print(lv_log_level_t level, const char * buf) {
@@ -201,6 +208,25 @@ void saveTarget2MAC(const String& mac) {
   
   storedTarget2MAC = mac;
   Serial.println("Saved Target2 MAC to NVS: " + mac);
+}
+
+// ADDED: Load auto-connect state from NVS
+void loadAutoConnectState() {
+  preferences.begin(NVS_NAMESPACE, false);
+  autoConnectEnabled = preferences.getBool(AUTOCONNECT_ENABLED_KEY, true); // Default to enabled
+  preferences.end();
+  
+  Serial.println("Auto-connect enabled: " + String(autoConnectEnabled ? "YES" : "NO"));
+}
+
+// ADDED: Save auto-connect state to NVS
+void saveAutoConnectState(bool enabled) {
+  preferences.begin(NVS_NAMESPACE, false);
+  preferences.putBool(AUTOCONNECT_ENABLED_KEY, enabled);
+  preferences.end();
+  
+  autoConnectEnabled = enabled;
+  Serial.println("Saved auto-connect state: " + String(enabled ? "ENABLED" : "DISABLED"));
 }
 
 // ADDED: Function to update stored devices screen
@@ -871,6 +897,25 @@ static void event_handler_btnTarget2(lv_event_t * e) {
   }
 }
 
+// ADDED: Event handler for auto-connect checkbox
+static void event_handler_autoConnectCheckbox(lv_event_t * e) {
+  if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+    lv_obj_t* obj = (lv_obj_t*)lv_event_get_target(e);
+    bool checked = lv_obj_has_state(obj, LV_STATE_CHECKED);
+    
+    Serial.println("Auto-connect checkbox changed: " + String(checked ? "ENABLED" : "DISABLED"));
+    
+    // Save the state to NVS
+    saveAutoConnectState(checked);
+    
+    // Update status label
+    if (connectionStatusLabel) {
+      lv_label_set_text(connectionStatusLabel, 
+                       checked ? "Status: Auto-connect ENABLED" : "Status: Auto-connect DISABLED");
+    }
+  }
+}
+
 static void event_handler_btn1(lv_event_t * e) {
   if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
     lv_obj_t * obj = (lv_obj_t*) lv_event_get_target(e);
@@ -1095,7 +1140,7 @@ void create_stored_devices_screen() {
   lv_obj_center(lblDisconnectTarget2);
 }
 
-// Screen creation - Bluetooth Screen (UPDATED: Added Target1 button)
+// Screen creation - Bluetooth Screen (UPDATED: Added Target1 button and Auto-connect checkbox)
 void create_bluetooth_screen() {
   bluetooth_screen = lv_obj_create(NULL);
   lv_obj_set_size(bluetooth_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -1110,7 +1155,7 @@ void create_bluetooth_screen() {
   
   // Device list - WIDE: 220px
   deviceList = lv_list_create(bluetooth_screen);
-  lv_obj_set_size(deviceList, 220, 140); // WIDE: 220px
+  lv_obj_set_size(deviceList, 220, 120); // Reduced height from 140 to 120 to make room for checkbox
   lv_obj_align(deviceList, LV_ALIGN_TOP_LEFT, 0, 40);
   // NOTE: Event handler is now added to individual buttons, not the list
   lv_list_add_text(deviceList, "Devices will appear here");
@@ -1157,6 +1202,26 @@ void create_bluetooth_screen() {
   lv_obj_t * lblTarget2 = lv_label_create(btnTarget2);
   lv_label_set_text(lblTarget2, "Target2");
   lv_obj_center(lblTarget2);
+  
+  // ADDED: Auto-connect checkbox and label
+  // Container for checkbox and label
+  lv_obj_t * autoConnectContainer = lv_obj_create(bluetooth_screen);
+  lv_obj_set_size(autoConnectContainer, 220, 35);
+  lv_obj_align(autoConnectContainer, LV_ALIGN_TOP_LEFT, 0, 165); // Below device list
+  lv_obj_set_style_border_width(autoConnectContainer, 0, LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(autoConnectContainer, LV_OPA_TRANSP, LV_PART_MAIN);
+  lv_obj_set_style_pad_all(autoConnectContainer, 0, LV_PART_MAIN);
+  
+  // Checkbox
+  lv_obj_t * autoConnectCheckbox = lv_checkbox_create(autoConnectContainer);
+  lv_checkbox_set_text(autoConnectCheckbox, "Auto-connect");
+  lv_obj_add_event_cb(autoConnectCheckbox, event_handler_autoConnectCheckbox, LV_EVENT_VALUE_CHANGED, NULL);
+  lv_obj_align(autoConnectCheckbox, LV_ALIGN_LEFT_MID, 0, 0);
+  
+  // Set initial state from NVS
+  if (autoConnectEnabled) {
+    lv_obj_add_state(autoConnectCheckbox, LV_STATE_CHECKED);
+  }
   
   // Container for navigation buttons (75x35) at bottom right
   lv_obj_t * nav_container = lv_obj_create(bluetooth_screen);
@@ -1270,6 +1335,9 @@ void setup() {
   // Load stored MACs from NVS
   loadStoredMACs();
   
+  // Load auto-connect state from NVS
+  loadAutoConnectState();
+  
   // Initialize stored devices
   initStoredDevices();
   
@@ -1288,6 +1356,7 @@ void setup() {
   Serial.println("Device Name: POV_BLE_Controller");
   Serial.println("Stored Target1 MAC: " + storedTarget1MAC);
   Serial.println("Stored Target2 MAC: " + storedTarget2MAC);
+  Serial.println("Auto-connect enabled: " + String(autoConnectEnabled ? "YES" : "NO"));
   Serial.println("Service UUID: " + String(SERVICE_UUID));
   Serial.println("Characteristic UUID: " + String(CHARACTERISTIC_UUID));
   
@@ -1316,7 +1385,7 @@ void setup() {
   
   // NEW: Try to auto-connect to target device (after UI is created)
   delay(1000); // Give BLE stack time to initialize
-  if (storedTarget1MAC != "00:00:00:00:00:00") {
+  if (autoConnectEnabled && storedTarget1MAC != "00:00:00:00:00:00") {
     bleAutoConnectDirect();
   }
   
@@ -1327,8 +1396,9 @@ void setup() {
   Serial.println("3. Tap a device in the list to select it");
   Serial.println("4. Tap 'Target1' to store it as Target1 (for auto-connect)");
   Serial.println("5. Tap 'Target2' to store it as Target2");
-  Serial.println("6. Tap 'Stored' to view and manage stored devices");
-  Serial.println("7. Return to main screen and toggle relays");
+  Serial.println("6. Use 'Auto-connect' checkbox to enable/disable auto-connect at boot");
+  Serial.println("7. Tap 'Stored' to view and manage stored devices");
+  Serial.println("8. Return to main screen and toggle relays");
   Serial.println("==========================================\n");
 }
 
