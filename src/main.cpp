@@ -741,10 +741,10 @@ static void event_handler_btnBack(lv_event_t * e) {
   }
 }
 
-// ADDED: Back from stored devices screen
+// ADDED: Back from stored devices screen - CORRECTED to go to Bluetooth screen
 static void event_handler_btnBackStored(lv_event_t * e) {
   if(lv_event_get_code(e) == LV_EVENT_CLICKED) {
-    lv_screen_load(main_screen);
+    lv_screen_load(bluetooth_screen);  // CORRECTED: Goes to Bluetooth screen, not main screen
   }
 }
 
@@ -1028,7 +1028,7 @@ void create_stored_devices_screen() {
   // Target1 Connect Button
   lv_obj_t * btnConnectTarget1 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnConnectTarget1, event_handler_btnConnectTarget1, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 60);  // Moved down from 50 to 60
+  lv_obj_align(btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 60);  // Moved right from -10 to -5
   lv_obj_set_size(btnConnectTarget1, 80, 35);
   lv_obj_t * lblConnectTarget1 = lv_label_create(btnConnectTarget1);
   lv_label_set_text(lblConnectTarget1, "Connect");
@@ -1037,7 +1037,7 @@ void create_stored_devices_screen() {
   // Target1 Disconnect Button
   lv_obj_t * btnDisconnectTarget1 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnDisconnectTarget1, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 100);  // Moved down from 90 to 100
+  lv_obj_align(btnDisconnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 100);  // Moved right from -10 to -5
   lv_obj_set_size(btnDisconnectTarget1, 80, 35);
   lv_obj_t * lblDisconnectTarget1 = lv_label_create(btnDisconnectTarget1);
   lv_label_set_text(lblDisconnectTarget1, "Disconnect");
@@ -1079,7 +1079,7 @@ void create_stored_devices_screen() {
   // Target2 Connect Button
   lv_obj_t * btnConnectTarget2 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnConnectTarget2, event_handler_btnConnectTarget2, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 165);  // Changed from 170 to 165 (moved up 5px)
+  lv_obj_align(btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 165);  // Moved right from -10 to -5
   lv_obj_set_size(btnConnectTarget2, 80, 35);
   lv_obj_t * lblConnectTarget2 = lv_label_create(btnConnectTarget2);
   lv_label_set_text(lblConnectTarget2, "Connect");
@@ -1088,7 +1088,7 @@ void create_stored_devices_screen() {
   // Target2 Disconnect Button
   lv_obj_t * btnDisconnectTarget2 = lv_button_create(stored_devices_screen);
   lv_obj_add_event_cb(btnDisconnectTarget2, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 205);  // Changed from 210 to 205 (moved up 5px)
+  lv_obj_align(btnDisconnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 205);  // Moved right from -10 to -5
   lv_obj_set_size(btnDisconnectTarget2, 80, 35);
   lv_obj_t * lblDisconnectTarget2 = lv_label_create(btnDisconnectTarget2);
   lv_label_set_text(lblDisconnectTarget2, "Disconnect");
