@@ -167,12 +167,12 @@ void touchscreen_read(lv_indev_t * indev, lv_indev_data_t * data) {
 void updateStatusIndicator() {
   if (status_indicator) {
     if (isConnected && pClient && pClient->isConnected()) {
-      // Connected - Yellow (FFCC00)
-      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFFCC00), LV_PART_MAIN);
+      // Connected - Yellow (0x00FFFF which is Red+Green on your display)
+      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0x00FFFF), LV_PART_MAIN);
       lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
     } else {
-      // Not connected - Blue (0000FF)
-      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0x0000FF), LV_PART_MAIN);
+      // Not connected - Blue (0xFF0000 on your display)
+      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFF0000), LV_PART_MAIN);
       lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
     }
   }
@@ -1251,6 +1251,8 @@ void create_bluetooth_screen() {
 }
 
 // Screen creation - Main Screen
+// Screen creation - Main Screen
+// Screen creation - Main Screen
 void create_main_screen() {
   main_screen = lv_screen_active();
   
@@ -1259,8 +1261,8 @@ void create_main_screen() {
   lv_obj_set_size(status_indicator, 10, 10);  // 10px diameter
   lv_obj_set_style_radius(status_indicator, 5, LV_PART_MAIN);  // Make it circular
   lv_obj_align(status_indicator, LV_ALIGN_TOP_RIGHT, -10, 10);  // 5px from top and right edges
-  // Initial color: Blue (not connected)
-  lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0x0000FF), LV_PART_MAIN);
+  // Initial color: Blue (not connected) - Using 0xFF0000 which is blue on your display
+  lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFF0000), LV_PART_MAIN);
   lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_border_width(status_indicator, 0, LV_PART_MAIN);  // No border
   
@@ -1269,62 +1271,65 @@ void create_main_screen() {
   lv_obj_add_event_cb(btnSet, event_handler_btnSet, LV_EVENT_CLICKED, NULL);
   lv_obj_align(btnSet, LV_ALIGN_TOP_MID, 0, 15);  // Changed from 10 to 15
   lv_obj_set_size(btnSet, 200, 40);
-  // 1. Set the text color to white
+  // Set the text color to white
   lv_obj_set_style_text_color(btnSet, lv_color_white(), LV_PART_MAIN);
-  // 2. Set the background color to green
-  // Make sure the background is fully opaque first
+  // Set the background color to green (0x0000FF on your display)
   lv_obj_set_style_bg_opa(btnSet, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(btnSet, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
-  // 3. Optional: Set opacity to make sure the background is solid (LV_OPA_COVER is opaque)
+  lv_obj_set_style_bg_color(btnSet, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_DEFAULT);
   lv_obj_t * lblSet = lv_label_create(btnSet);
   lv_label_set_text(lblSet, "POV BLE Controller");
   lv_obj_center(lblSet);
-  
   
   // Relay buttons
   const int btnWidth = 150;
   const int btnHeight = 70;
   
+  // Helper function to create relay buttons with consistent styling
+  auto create_relay_button = [&](const char* label, lv_event_cb_t event_cb, lv_align_t align, int x_offset, int y_offset) -> lv_obj_t* {
+    lv_obj_t * btn = lv_button_create(main_screen);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_obj_align(btn, align, x_offset, y_offset);
+    lv_obj_set_size(btn, btnWidth, btnHeight);
+    lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
+    
+    // Set blue background (0xFF0000 on your display)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Set white text
+    lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
+    
+    // Set pressed/checked state styling (lighter blue)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF6666), LV_PART_MAIN | LV_STATE_CHECKED);
+    
+    // Add border for better visibility
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create label with larger font for bolder appearance
+    lv_obj_t * lbl = lv_label_create(btn);
+    lv_label_set_text(lbl, label);
+    // Use larger font size 16 for bolder appearance
+    lv_obj_set_style_text_font(lbl, &lv_font_montserrat_16, LV_PART_MAIN);
+    lv_obj_center(lbl);
+    
+    return btn;
+  };
+  
   // Button 1
-  lv_obj_t * btn1 = lv_button_create(main_screen);
-  lv_obj_add_event_cb(btn1, event_handler_btn1, LV_EVENT_VALUE_CHANGED, NULL);
-  lv_obj_align(btn1, LV_ALIGN_CENTER, -80, -15);
-  lv_obj_set_size(btn1, btnWidth, btnHeight);
-  lv_obj_add_flag(btn1, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_t * lbl1 = lv_label_create(btn1);
-  lv_label_set_text(lbl1, "Relay1");
-  lv_obj_center(lbl1);
+  lv_obj_t * btn1 = create_relay_button("Relay1", event_handler_btn1, LV_ALIGN_CENTER, -80, -15);
   
   // Button 2
-  lv_obj_t * btn2 = lv_button_create(main_screen);
-  lv_obj_add_event_cb(btn2, event_handler_btn2, LV_EVENT_VALUE_CHANGED, NULL);
-  lv_obj_align(btn2, LV_ALIGN_CENTER, 80, -15);
-  lv_obj_set_size(btn2, btnWidth, btnHeight);
-  lv_obj_add_flag(btn2, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_t * lbl2 = lv_label_create(btn2);
-  lv_label_set_text(lbl2, "Relay2");
-  lv_obj_center(lbl2);
+  lv_obj_t * btn2 = create_relay_button("Relay2", event_handler_btn2, LV_ALIGN_CENTER, 80, -15);
   
   // Button 3
-  lv_obj_t * btn3 = lv_button_create(main_screen);
-  lv_obj_add_event_cb(btn3, event_handler_btn3, LV_EVENT_VALUE_CHANGED, NULL);
-  lv_obj_align(btn3, LV_ALIGN_CENTER, -80, 70);
-  lv_obj_set_size(btn3, btnWidth, btnHeight);
-  lv_obj_add_flag(btn3, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_t * lbl3 = lv_label_create(btn3);
-  lv_label_set_text(lbl3, "Relay3");
-  lv_obj_center(lbl3);
+  lv_obj_t * btn3 = create_relay_button("Relay3", event_handler_btn3, LV_ALIGN_CENTER, -80, 70);
   
   // Button 4
-  lv_obj_t * btn4 = lv_button_create(main_screen);
-  lv_obj_add_event_cb(btn4, event_handler_btn4, LV_EVENT_VALUE_CHANGED, NULL);
-  lv_obj_align(btn4, LV_ALIGN_CENTER, 80, 70);
-  lv_obj_set_size(btn4, btnWidth, btnHeight);
-  lv_obj_add_flag(btn4, LV_OBJ_FLAG_CHECKABLE);
-  lv_obj_t * lbl4 = lv_label_create(btn4);
-  lv_label_set_text(lbl4, "Relay4");
-  lv_obj_center(lbl4);
+  lv_obj_t * btn4 = create_relay_button("Relay4", event_handler_btn4, LV_ALIGN_CENTER, 80, 70);
 }
+
 
 void setup() {
   Serial.begin(115200);
