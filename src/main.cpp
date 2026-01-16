@@ -133,6 +133,8 @@ static void event_handler_btn1(lv_event_t * e);
 static void event_handler_btn2(lv_event_t * e);
 static void event_handler_btn3(lv_event_t * e);
 static void event_handler_btn4(lv_event_t * e);
+static void event_handler_btn5(lv_event_t * e);
+static void event_handler_btn6(lv_event_t * e);
 static void event_handler_btnTarget1(lv_event_t * e);  // ADDED: Store as Target1
 static void event_handler_btnTarget2(lv_event_t * e);  // ADDED: Store as Target2
 static void event_handler_btnStoredDevices(lv_event_t * e);  // ADDED: For Stored Devices button
@@ -1031,6 +1033,41 @@ static void event_handler_btn4(lv_event_t * e) {
   }
 }
 
+// Add these after the event_handler_btn4 function
+static void event_handler_btn5(lv_event_t * e) {
+  if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+    lv_obj_t * obj = (lv_obj_t*) lv_event_get_target(e);
+    bool state = lv_obj_has_state(obj, LV_STATE_CHECKED);
+    
+    if (state) {
+      // Relay 5 ON: A00101A2 (placeholder)
+      bleSendHexString("A00101A2");
+      Serial.println("Relay5: ON (A00101A2)");
+    } else {
+      // Relay 5 OFF: A00100A1 (placeholder)
+      bleSendHexString("A00100A1");
+      Serial.println("Relay5: OFF (A00100A1)");
+    }
+  }
+}
+
+static void event_handler_btn6(lv_event_t * e) {
+  if(lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+    lv_obj_t * obj = (lv_obj_t*) lv_event_get_target(e);
+    bool state = lv_obj_has_state(obj, LV_STATE_CHECKED);
+    
+    if (state) {
+      // Relay 6 ON: A00101A2 (placeholder)
+      bleSendHexString("A00101A2");
+      Serial.println("Relay6: ON (A00101A2)");
+    } else {
+      // Relay 6 OFF: A00100A1 (placeholder)
+      bleSendHexString("A00100A1");
+      Serial.println("Relay6: OFF (A00100A1)");
+    }
+  }
+}
+
 // ADDED: Event handler for Stored Devices button
 static void event_handler_btnStoredDevices(lv_event_t * e) {
   if(lv_event_get_code(e) == LV_EVENT_CLICKED) {
@@ -1408,6 +1445,7 @@ void create_bluetooth_screen() {
 }
 
 // Screen creation - Main Screen
+// Screen creation - Main Screen
 void create_main_screen() {
   main_screen = lv_screen_active();
   
@@ -1455,15 +1493,26 @@ void create_main_screen() {
   lv_obj_set_style_text_font(lblSet, &lv_font_montserrat_16, LV_PART_MAIN);
   lv_obj_center(lblSet);
   
-  // Relay buttons
-  const int btnWidth = 150;
-  const int btnHeight = 70;
+  // Calculate button dimensions for 3 columns
+  const int btnWidth = 90;  // Smaller width for 3 columns
+  const int btnHeight = 70; // Same height as before
+  const int horizontalSpacing = 10; // Space between buttons
+  const int verticalSpacing = 15;   // Space between rows
+  const int totalWidth = (btnWidth * 3) + (horizontalSpacing * 2); // Total width of button row
+  
+  // Calculate starting X position to center the row
+  const int startX = -(totalWidth / 2) + (btnWidth / 2);
   
   // Helper function to create relay buttons with consistent styling
-  auto create_relay_button = [&](const char* label, lv_event_cb_t event_cb, lv_align_t align, int x_offset, int y_offset) -> lv_obj_t* {
+  auto create_relay_button = [&](const char* label, lv_event_cb_t event_cb, int column, int row) -> lv_obj_t* {
     lv_obj_t * btn = lv_button_create(main_screen);
     lv_obj_add_event_cb(btn, event_cb, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_obj_align(btn, align, x_offset, y_offset);
+    
+    // Calculate position based on column and row
+    int xPos = startX + (column * (btnWidth + horizontalSpacing));
+    int yPos = 70 + (row * (btnHeight + verticalSpacing)); // Start below title button
+    
+    lv_obj_set_pos(btn, SCREEN_WIDTH/2 + xPos, yPos);
     lv_obj_set_size(btn, btnWidth, btnHeight);
     lv_obj_add_flag(btn, LV_OBJ_FLAG_CHECKABLE);
     
@@ -1492,17 +1541,15 @@ void create_main_screen() {
     return btn;
   };
   
-  // Button 1
-  lv_obj_t * btn1 = create_relay_button("Relay1", event_handler_btn1, LV_ALIGN_CENTER, -80, -15);
+  // Top row buttons (row 0)
+  lv_obj_t * btn1 = create_relay_button("Relay1", event_handler_btn1, 0, 0);  // Column 0, Row 0
+  lv_obj_t * btn2 = create_relay_button("Relay2", event_handler_btn2, 1, 0);  // Column 1, Row 0
+  lv_obj_t * btn3 = create_relay_button("Relay3", event_handler_btn3, 2, 0);  // Column 2, Row 0
   
-  // Button 2
-  lv_obj_t * btn2 = create_relay_button("Relay2", event_handler_btn2, LV_ALIGN_CENTER, 80, -15);
-  
-  // Button 3
-  lv_obj_t * btn3 = create_relay_button("Relay3", event_handler_btn3, LV_ALIGN_CENTER, -80, 70);
-  
-  // Button 4
-  lv_obj_t * btn4 = create_relay_button("Relay4", event_handler_btn4, LV_ALIGN_CENTER, 80, 70);
+  // Bottom row buttons (row 1)
+  lv_obj_t * btn4 = create_relay_button("Relay4", event_handler_btn4, 0, 1);  // Column 0, Row 1
+  lv_obj_t * btn5 = create_relay_button("Relay5", event_handler_btn5, 1, 1);  // Column 1, Row 1
+  lv_obj_t * btn6 = create_relay_button("Relay6", event_handler_btn6, 2, 1);  // Column 2, Row 1
 }
 
 void setup() {
