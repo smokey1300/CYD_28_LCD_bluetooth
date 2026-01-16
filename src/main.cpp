@@ -1009,6 +1009,7 @@ static void event_handler_btnConnectTarget2(lv_event_t * e) {
 }
 
 // Screen creation - Stored Devices Screen
+// Screen creation - Stored Devices Screen
 void create_stored_devices_screen() {
   stored_devices_screen = lv_obj_create(NULL);
   lv_obj_set_size(stored_devices_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -1026,7 +1027,64 @@ void create_stored_devices_screen() {
   lv_obj_set_style_text_color(title, lv_color_white(), LV_PART_MAIN);
   lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
   
-  // Container for navigation buttons (75x35) at top right - REPLACED back button
+  // Helper function to create blue buttons like main screen
+  auto create_blue_button = [&](const char* label, lv_event_cb_t event_cb, lv_align_t align, int x_offset, int y_offset, int width = 80, int height = 35) -> lv_obj_t* {
+    lv_obj_t * btn = lv_button_create(stored_devices_screen);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_align(btn, align, x_offset, y_offset);
+    lv_obj_set_size(btn, width, height);
+    
+    // Set blue background (0xFF0000 on your display)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Set white text
+    lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
+    
+    // Set font size 12
+    lv_obj_set_style_text_font(btn, &lv_font_montserrat_12, LV_PART_MAIN);
+    
+    // Add border for better visibility
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create label
+    lv_obj_t * lbl = lv_label_create(btn);
+    lv_label_set_text(lbl, label);
+    lv_obj_center(lbl);
+    
+    return btn;
+  };
+  
+  // Helper function for navigation buttons (smaller blue buttons)
+  auto create_nav_button = [&](const char* symbol, lv_event_cb_t event_cb, lv_align_t align, lv_obj_t* parent) -> lv_obj_t* {
+    lv_obj_t * btn = lv_button_create(parent);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_set_size(btn, 35, 35);
+    lv_obj_align(btn, align, 0, 0);
+    
+    // Set blue background (0xFF0000 on your display)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Set white text
+    lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
+    
+    // Add border for better visibility
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create label with symbol
+    lv_obj_t * lbl = lv_label_create(btn);
+    lv_label_set_text(lbl, symbol);
+    lv_obj_center(lbl);
+    
+    return btn;
+  };
+  
+  // Container for navigation buttons (75x35) at top right
   lv_obj_t * nav_container = lv_obj_create(stored_devices_screen);
   lv_obj_set_size(nav_container, 75, 35);
   lv_obj_align(nav_container, LV_ALIGN_TOP_RIGHT, -5, 10);  // Position at top right
@@ -1034,23 +1092,11 @@ void create_stored_devices_screen() {
   lv_obj_set_style_bg_opa(nav_container, LV_OPA_TRANSP, LV_PART_MAIN);
   lv_obj_set_style_pad_all(nav_container, 0, LV_PART_MAIN);
   
-  // Left button (Back to bluetooth screen) - 35x35
-  lv_obj_t * btnBackToBluetooth = lv_button_create(nav_container);
-  lv_obj_add_event_cb(btnBackToBluetooth, event_handler_btnBackStored, LV_EVENT_CLICKED, NULL);
-  lv_obj_set_size(btnBackToBluetooth, 35, 35);
-  lv_obj_align(btnBackToBluetooth, LV_ALIGN_LEFT_MID, 0, 0);
-  lv_obj_t * lblBackToBluetooth = lv_label_create(btnBackToBluetooth);
-  lv_label_set_text(lblBackToBluetooth, LV_SYMBOL_LEFT);
-  lv_obj_center(lblBackToBluetooth);
+  // Left button (Back to bluetooth screen) - 35x35 with blue style
+  create_nav_button(LV_SYMBOL_LEFT, event_handler_btnBackStored, LV_ALIGN_LEFT_MID, nav_container);
   
-  // Right button (Back to main screen) - 35x35
-  lv_obj_t * btnBackToMain = lv_button_create(nav_container);
-  lv_obj_add_event_cb(btnBackToMain, event_handler_btnBack, LV_EVENT_CLICKED, NULL);
-  lv_obj_set_size(btnBackToMain, 35, 35);
-  lv_obj_align(btnBackToMain, LV_ALIGN_RIGHT_MID, 0, 0);
-  lv_obj_t * lblBackToMain = lv_label_create(btnBackToMain);
-  lv_label_set_text(lblBackToMain, LV_SYMBOL_RIGHT);
-  lv_obj_center(lblBackToMain);
+  // Right button (Back to main screen) - 35x35 with blue style
+  create_nav_button(LV_SYMBOL_RIGHT, event_handler_btnBack, LV_ALIGN_RIGHT_MID, nav_container);
   
   // Target1 Section - Adjusted Y positions since navigation container is at top
   lv_obj_t * target1Label = lv_label_create(stored_devices_screen);
@@ -1076,23 +1122,11 @@ void create_stored_devices_screen() {
   lv_obj_set_style_text_font(target1StatusLabel, &lv_font_montserrat_12, LV_PART_MAIN);
   lv_obj_set_style_text_color(target1StatusLabel, lv_color_hex(0xFF0000), LV_PART_MAIN);
   
-  // Target1 Connect Button
-  lv_obj_t * btnConnectTarget1 = lv_button_create(stored_devices_screen);
-  lv_obj_add_event_cb(btnConnectTarget1, event_handler_btnConnectTarget1, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 60);  // Moved right from -10 to -5
-  lv_obj_set_size(btnConnectTarget1, 80, 35);
-  lv_obj_t * lblConnectTarget1 = lv_label_create(btnConnectTarget1);
-  lv_label_set_text(lblConnectTarget1, "Connect");
-  lv_obj_center(lblConnectTarget1);
+  // Target1 Connect Button - Blue style
+  create_blue_button("Connect", event_handler_btnConnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 60);
   
-  // Target1 Disconnect Button
-  lv_obj_t * btnDisconnectTarget1 = lv_button_create(stored_devices_screen);
-  lv_obj_add_event_cb(btnDisconnectTarget1, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget1, LV_ALIGN_TOP_RIGHT, -5, 100);  // Moved right from -10 to -5
-  lv_obj_set_size(btnDisconnectTarget1, 80, 35);
-  lv_obj_t * lblDisconnectTarget1 = lv_label_create(btnDisconnectTarget1);
-  lv_label_set_text(lblDisconnectTarget1, "Disconnect");
-  lv_obj_center(lblDisconnectTarget1);
+  // Target1 Disconnect Button - Blue style
+  create_blue_button("Disconnect", event_handler_btnDisconnect, LV_ALIGN_TOP_RIGHT, -5, 100);
   
   // Separator line - Adjusted Y position
   lv_obj_t * line1 = lv_line_create(stored_devices_screen);
@@ -1129,25 +1163,14 @@ void create_stored_devices_screen() {
   lv_obj_set_style_text_font(target2StatusLabel, &lv_font_montserrat_12, LV_PART_MAIN);
   lv_obj_set_style_text_color(target2StatusLabel, lv_color_hex(0xFFA500), LV_PART_MAIN);
   
-  // Target2 Connect Button
-  lv_obj_t * btnConnectTarget2 = lv_button_create(stored_devices_screen);
-  lv_obj_add_event_cb(btnConnectTarget2, event_handler_btnConnectTarget2, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 165);  // Moved right from -10 to -5
-  lv_obj_set_size(btnConnectTarget2, 80, 35);
-  lv_obj_t * lblConnectTarget2 = lv_label_create(btnConnectTarget2);
-  lv_label_set_text(lblConnectTarget2, "Connect");
-  lv_obj_center(lblConnectTarget2);
+  // Target2 Connect Button - Blue style
+  create_blue_button("Connect", event_handler_btnConnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 165);
   
-  // Target2 Disconnect Button
-  lv_obj_t * btnDisconnectTarget2 = lv_button_create(stored_devices_screen);
-  lv_obj_add_event_cb(btnDisconnectTarget2, event_handler_btnDisconnect, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnDisconnectTarget2, LV_ALIGN_TOP_RIGHT, -5, 205);  // Moved right from -10 to -5
-  lv_obj_set_size(btnDisconnectTarget2, 80, 35);
-  lv_obj_t * lblDisconnectTarget2 = lv_label_create(btnDisconnectTarget2);
-  lv_label_set_text(lblDisconnectTarget2, "Disconnect");
-  lv_obj_center(lblDisconnectTarget2);
+  // Target2 Disconnect Button - Blue style
+  create_blue_button("Disconnect", event_handler_btnDisconnect, LV_ALIGN_TOP_RIGHT, -5, 205);
 }
 
+// Screen creation - Bluetooth Screen
 // Screen creation - Bluetooth Screen
 void create_bluetooth_screen() {
   bluetooth_screen = lv_obj_create(NULL);
@@ -1191,32 +1214,44 @@ void create_bluetooth_screen() {
   lv_obj_set_style_text_align(connectionStatusLabel, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_set_style_text_color(connectionStatusLabel, lv_color_white(), LV_PART_MAIN);
   
-  // Scan button
-  lv_obj_t * btnScan = lv_button_create(bluetooth_screen);
-  lv_obj_add_event_cb(btnScan, event_handler_btnScan, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnScan, LV_ALIGN_TOP_RIGHT, -5, 5);
-  lv_obj_set_size(btnScan, 80, 35);
-  lv_obj_t * lblScan = lv_label_create(btnScan);
-  lv_label_set_text(lblScan, "Scan");
-  lv_obj_center(lblScan);
+  // Helper function to create blue buttons like main screen
+  auto create_blue_button = [&](const char* label, lv_event_cb_t event_cb, lv_align_t align, int x_offset, int y_offset, int width = 80, int height = 35) -> lv_obj_t* {
+    lv_obj_t * btn = lv_button_create(bluetooth_screen);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_align(btn, align, x_offset, y_offset);
+    lv_obj_set_size(btn, width, height);
+    
+    // Set blue background (0xFF0000 on your display)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Set white text
+    lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
+    
+    // Set font size 12 (or 14 for larger if preferred)
+    lv_obj_set_style_text_font(btn, &lv_font_montserrat_12, LV_PART_MAIN);
+    
+    // Add border for better visibility
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create label
+    lv_obj_t * lbl = lv_label_create(btn);
+    lv_label_set_text(lbl, label);
+    lv_obj_center(lbl);
+    
+    return btn;
+  };
   
-  // Target1 Store button - ADDED
-  lv_obj_t * btnTarget1 = lv_button_create(bluetooth_screen);
-  lv_obj_add_event_cb(btnTarget1, event_handler_btnTarget1, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnTarget1, LV_ALIGN_TOP_RIGHT, -5, 50);
-  lv_obj_set_size(btnTarget1, 80, 35);
-  lv_obj_t * lblTarget1 = lv_label_create(btnTarget1);
-  lv_label_set_text(lblTarget1, "Target1");
-  lv_obj_center(lblTarget1);
+  // Scan button - Blue style
+  lv_obj_t * btnScan = create_blue_button("Scan", event_handler_btnScan, LV_ALIGN_TOP_RIGHT, -5, 5);
   
-  // Target2 Store button - UPDATED (was Target2 connect, now store)
-  lv_obj_t * btnTarget2 = lv_button_create(bluetooth_screen);
-  lv_obj_add_event_cb(btnTarget2, event_handler_btnTarget2, LV_EVENT_CLICKED, NULL);
-  lv_obj_align(btnTarget2, LV_ALIGN_TOP_RIGHT, -5, 95);
-  lv_obj_set_size(btnTarget2, 80, 35);
-  lv_obj_t * lblTarget2 = lv_label_create(btnTarget2);
-  lv_label_set_text(lblTarget2, "Target2");
-  lv_obj_center(lblTarget2);
+  // Target1 Store button - Blue style
+  lv_obj_t * btnTarget1 = create_blue_button("Target1", event_handler_btnTarget1, LV_ALIGN_TOP_RIGHT, -5, 50);
+  
+  // Target2 Store button - Blue style
+  lv_obj_t * btnTarget2 = create_blue_button("Target2", event_handler_btnTarget2, LV_ALIGN_TOP_RIGHT, -5, 95);
   
   // ADDED: Auto-connect checkbox and label
   // Container for checkbox and label
@@ -1233,6 +1268,9 @@ void create_bluetooth_screen() {
   lv_obj_add_event_cb(autoConnectCheckbox, event_handler_autoConnectCheckbox, LV_EVENT_VALUE_CHANGED, NULL);
   lv_obj_align(autoConnectCheckbox, LV_ALIGN_LEFT_MID, 0, 0);
   
+  // Set checkbox text color to white
+  lv_obj_set_style_text_color(autoConnectCheckbox, lv_color_white(), LV_PART_MAIN);
+  
   // Set initial state from NVS
   if (autoConnectEnabled) {
     lv_obj_add_state(autoConnectCheckbox, LV_STATE_CHECKED);
@@ -1246,23 +1284,38 @@ void create_bluetooth_screen() {
   lv_obj_set_style_bg_opa(nav_container, LV_OPA_TRANSP, LV_PART_MAIN);
   lv_obj_set_style_pad_all(nav_container, 0, LV_PART_MAIN);
   
-  // Left button (Back to main screen) - 35x35
-  lv_obj_t * btnBack = lv_button_create(nav_container);
-  lv_obj_add_event_cb(btnBack, event_handler_btnBack, LV_EVENT_CLICKED, NULL);
-  lv_obj_set_size(btnBack, 35, 35);
-  lv_obj_align(btnBack, LV_ALIGN_LEFT_MID, 0, 0);
-  lv_obj_t * lblBack = lv_label_create(btnBack);
-  lv_label_set_text(lblBack, LV_SYMBOL_LEFT);
-  lv_obj_center(lblBack);
+  // Helper function for navigation buttons (smaller blue buttons)
+  auto create_nav_button = [&](const char* symbol, lv_event_cb_t event_cb, lv_align_t align) -> lv_obj_t* {
+    lv_obj_t * btn = lv_button_create(nav_container);
+    lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
+    lv_obj_set_size(btn, 35, 35);
+    lv_obj_align(btn, align, 0, 0);
+    
+    // Set blue background (0xFF0000 on your display)
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Set white text
+    lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
+    
+    // Add border for better visibility
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_white(), LV_PART_MAIN);
+    lv_obj_set_style_border_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    
+    // Create label with symbol
+    lv_obj_t * lbl = lv_label_create(btn);
+    lv_label_set_text(lbl, symbol);
+    lv_obj_center(lbl);
+    
+    return btn;
+  };
   
-  // Right button (Go to stored devices) - 35x35
-  lv_obj_t * btnStoredDevices = lv_button_create(nav_container);
-  lv_obj_add_event_cb(btnStoredDevices, event_handler_btnStoredDevices, LV_EVENT_CLICKED, NULL);
-  lv_obj_set_size(btnStoredDevices, 35, 35);
-  lv_obj_align(btnStoredDevices, LV_ALIGN_RIGHT_MID, 0, 0);
-  lv_obj_t * lblStoredDevices = lv_label_create(btnStoredDevices);
-  lv_label_set_text(lblStoredDevices, LV_SYMBOL_RIGHT);
-  lv_obj_center(lblStoredDevices);
+  // Left button (Back to main screen) - 35x35 with blue style
+  create_nav_button(LV_SYMBOL_LEFT, event_handler_btnBack, LV_ALIGN_LEFT_MID);
+  
+  // Right button (Go to stored devices) - 35x35 with blue style
+  create_nav_button(LV_SYMBOL_RIGHT, event_handler_btnStoredDevices, LV_ALIGN_RIGHT_MID);
 }
 
 // Screen creation - Main Screen
@@ -1334,7 +1387,7 @@ void create_main_screen() {
     lv_obj_set_style_text_color(btn, lv_color_white(), LV_PART_MAIN);
     
     // Set pressed/checked state styling (lighter blue)
-    lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF6666), LV_PART_MAIN | LV_STATE_CHECKED);
+    lv_obj_set_style_bg_color(btn, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_CHECKED);
     
     // Add border for better visibility
     lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
