@@ -1172,6 +1172,7 @@ void create_stored_devices_screen() {
 
 // Screen creation - Bluetooth Screen
 // Screen creation - Bluetooth Screen
+// Screen creation - Bluetooth Screen
 void create_bluetooth_screen() {
   bluetooth_screen = lv_obj_create(NULL);
   lv_obj_set_size(bluetooth_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -1189,11 +1190,28 @@ void create_bluetooth_screen() {
   lv_obj_set_style_text_color(title, lv_color_white(), LV_PART_MAIN);
   lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
   
-  // Device list - WIDE: 220px
+  // Device list - WIDE: 220px - Style with blue background and white text
   deviceList = lv_list_create(bluetooth_screen);
-  lv_obj_set_size(deviceList, 220, 120); // Reduced height from 140 to 120 to make room for checkbox
+  lv_obj_set_size(deviceList, 220, 120);
   lv_obj_align(deviceList, LV_ALIGN_TOP_LEFT, 0, 40);
-  // NOTE: Event handler is now added to individual buttons, not the list
+  
+  // Style the list background to blue
+  lv_obj_set_style_bg_color(deviceList, lv_color_hex(0xFF0000), LV_PART_MAIN); // Blue background
+  lv_obj_set_style_bg_opa(deviceList, LV_OPA_COVER, LV_PART_MAIN);
+  lv_obj_set_style_border_width(deviceList, 2, LV_PART_MAIN);
+  lv_obj_set_style_border_color(deviceList, lv_color_white(), LV_PART_MAIN);
+  lv_obj_set_style_border_opa(deviceList, LV_OPA_COVER, LV_PART_MAIN);
+  lv_obj_set_style_radius(deviceList, 5, LV_PART_MAIN);
+  
+  // Style list text to white
+  lv_obj_set_style_text_color(deviceList, lv_color_white(), LV_PART_MAIN);
+  lv_obj_set_style_text_font(deviceList, &lv_font_montserrat_12, LV_PART_MAIN);
+  
+  // Style scrollbar if needed
+  lv_obj_set_style_bg_color(deviceList, lv_color_hex(0xFF6666), LV_PART_SCROLLBAR); // Lighter blue scrollbar
+  lv_obj_set_style_bg_opa(deviceList, LV_OPA_COVER, LV_PART_SCROLLBAR);
+  
+  // Add initial text with white color
   lv_list_add_text(deviceList, "Devices will appear here");
   
   // Selected device label
@@ -1317,7 +1335,6 @@ void create_bluetooth_screen() {
   // Right button (Go to stored devices) - 35x35 with blue style
   create_nav_button(LV_SYMBOL_RIGHT, event_handler_btnStoredDevices, LV_ALIGN_RIGHT_MID);
 }
-
 // Screen creation - Main Screen
 // Screen creation - Main Screen
 void create_main_screen() {
