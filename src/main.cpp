@@ -490,6 +490,9 @@ void bleStartScan() {
   // In the bleStartScan() function, replace the list update section with:
 
 // Update UI with found devices
+// In the bleStartScan() function, replace the list update section with:
+
+// Update UI with found devices
 if (deviceList) {
   // Clear the container (remove all children except the header)
   lv_obj_t* child = lv_obj_get_child(deviceList, 0);
@@ -582,14 +585,14 @@ if (deviceList) {
       Serial.printf("Added device %d to list: %s\n", i, displayText.c_str());
     }
   } else {
-    // Add "No devices found" message
+    // Add "No devices found" message with BLACK background
     lv_obj_t * noDevices = lv_label_create(deviceList);
     lv_label_set_text(noDevices, "No devices found");
     lv_obj_set_width(noDevices, 200);
     lv_obj_set_style_text_color(noDevices, lv_color_white(), LV_PART_MAIN);
     lv_obj_set_style_text_font(noDevices, &lv_font_montserrat_12, LV_PART_MAIN);
     lv_obj_set_style_text_align(noDevices, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-    lv_obj_set_style_bg_color(noDevices, lv_color_hex(0xFF0000), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(noDevices, lv_color_black(), LV_PART_MAIN); // BLACK background
     lv_obj_set_style_bg_opa(noDevices, LV_OPA_COVER, LV_PART_MAIN);
     lv_obj_set_style_pad_all(noDevices, 5, LV_PART_MAIN);
   }
@@ -1219,6 +1222,7 @@ void create_stored_devices_screen() {
 // Screen creation - Bluetooth Screen
 // Screen creation - Bluetooth Screen
 // Screen creation - Bluetooth Screen
+// Screen creation - Bluetooth Screen
 void create_bluetooth_screen() {
   bluetooth_screen = lv_obj_create(NULL);
   lv_obj_set_size(bluetooth_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -1314,8 +1318,8 @@ void create_bluetooth_screen() {
   lv_obj_set_size(list_container, 220, 120);
   lv_obj_align(list_container, LV_ALIGN_TOP_LEFT, 0, 50); // CHANGED from 40 to 50 to make room for nav buttons
   
-  // Style the container to look like a list with blue background
-  lv_obj_set_style_bg_color(list_container, lv_color_hex(0xFF0000), LV_PART_MAIN); // Blue background
+  // Style the container to look like a list with BLACK background
+  lv_obj_set_style_bg_color(list_container, lv_color_black(), LV_PART_MAIN); // CHANGED to BLACK background
   lv_obj_set_style_bg_opa(list_container, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_border_width(list_container, 2, LV_PART_MAIN);
   lv_obj_set_style_border_color(list_container, lv_color_white(), LV_PART_MAIN);
@@ -1327,25 +1331,25 @@ void create_bluetooth_screen() {
   lv_obj_set_flex_flow(list_container, LV_FLEX_FLOW_COLUMN);
   lv_obj_set_scrollbar_mode(list_container, LV_SCROLLBAR_MODE_AUTO);
   
-  // Create a header label for the list
+  // Create a header label for the list - with black background
   lv_obj_t * list_header = lv_label_create(list_container);
   lv_label_set_text(list_header, "Found Devices:");
   lv_obj_set_width(list_header, 200);
   lv_obj_set_style_text_color(list_header, lv_color_white(), LV_PART_MAIN);
   lv_obj_set_style_text_font(list_header, &lv_font_montserrat_12, LV_PART_MAIN);
   lv_obj_set_style_text_align(list_header, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(list_header, lv_color_hex(0xFF0000), LV_PART_MAIN); // Blue background
+  lv_obj_set_style_bg_color(list_header, lv_color_black(), LV_PART_MAIN); // CHANGED to BLACK background
   lv_obj_set_style_bg_opa(list_header, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_pad_all(list_header, 5, LV_PART_MAIN);
   
-  // Create initial placeholder text
+  // Create initial placeholder text - with black background
   lv_obj_t * placeholder = lv_label_create(list_container);
   lv_label_set_text(placeholder, "Devices will appear here");
   lv_obj_set_width(placeholder, 200);
   lv_obj_set_style_text_color(placeholder, lv_color_white(), LV_PART_MAIN);
   lv_obj_set_style_text_font(placeholder, &lv_font_montserrat_12, LV_PART_MAIN);
   lv_obj_set_style_text_align(placeholder, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(placeholder, lv_color_hex(0xFF0000), LV_PART_MAIN); // Blue background
+  lv_obj_set_style_bg_color(placeholder, lv_color_black(), LV_PART_MAIN); // CHANGED to BLACK background
   lv_obj_set_style_bg_opa(placeholder, LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_set_style_pad_all(placeholder, 5, LV_PART_MAIN);
   
@@ -1401,9 +1405,6 @@ void create_bluetooth_screen() {
   if (autoConnectEnabled) {
     lv_obj_add_state(autoConnectCheckbox, LV_STATE_CHECKED);
   }
-  
-  // Remove the old nav container code that was at the bottom
-  // (This has been moved to the top)
 }
 
 // Screen creation - Main Screen
