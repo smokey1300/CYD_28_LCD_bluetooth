@@ -163,18 +163,17 @@ void touchscreen_read(lv_indev_t * indev, lv_indev_data_t * data) {
   }
 }
 
-// Replace the updateStatusIndicator() function with this corrected version:
+// Update status indicator function
 void updateStatusIndicator() {
   if (status_indicator) {
     if (isConnected && pClient && pClient->isConnected()) {
-      // Connected - Yellow (0x00FFFF which is Red+Green on your display)
-      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0x00FFFF), LV_PART_MAIN);
-      lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
-    } else {
-      // Not connected - Blue (0xFF0000 on your display)
+      // Connected - Use BLUE (0xFF0000) 
       lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFF0000), LV_PART_MAIN);
-      lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
+    } else {
+      // Not connected - Use Red (0x00FF00)
+      lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0x00FF00), LV_PART_MAIN);
     }
+    lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
   }
 }
 
@@ -1014,12 +1013,17 @@ void create_stored_devices_screen() {
   stored_devices_screen = lv_obj_create(NULL);
   lv_obj_set_size(stored_devices_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
   
+  // Set background color to BLACK
+  lv_obj_set_style_bg_color(stored_devices_screen, lv_color_black(), LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(stored_devices_screen, LV_OPA_COVER, LV_PART_MAIN);
+  
   // Title
   lv_obj_t * title = lv_label_create(stored_devices_screen);
   lv_label_set_text(title, "Stored Devices");
   lv_obj_set_width(title, 300);
   lv_obj_set_style_text_font(title, &lv_font_montserrat_16, LV_PART_MAIN);
   lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_set_style_text_color(title, lv_color_white(), LV_PART_MAIN);
   lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
   
   // Container for navigation buttons (75x35) at top right - REPLACED back button
@@ -1054,6 +1058,7 @@ void create_stored_devices_screen() {
   lv_obj_set_width(target1Label, 200);
   lv_obj_align(target1Label, LV_ALIGN_TOP_LEFT, 10, 60);  // Moved down from 50 to 60
   lv_obj_set_style_text_font(target1Label, &lv_font_montserrat_14, LV_PART_MAIN);
+  lv_obj_set_style_text_color(target1Label, lv_color_white(), LV_PART_MAIN);
   
   // Target1 MAC address
   lv_obj_t * target1MacLabel = lv_label_create(stored_devices_screen);
@@ -1061,6 +1066,7 @@ void create_stored_devices_screen() {
   lv_obj_set_width(target1MacLabel, 220);
   lv_obj_align(target1MacLabel, LV_ALIGN_TOP_LEFT, 10, 85);  // Moved down from 75 to 85
   lv_obj_set_style_text_font(target1MacLabel, &lv_font_montserrat_12, LV_PART_MAIN);
+  lv_obj_set_style_text_color(target1MacLabel, lv_color_white(), LV_PART_MAIN);
   
   // Target1 Status
   target1StatusLabel = lv_label_create(stored_devices_screen);
@@ -1101,6 +1107,7 @@ void create_stored_devices_screen() {
   lv_obj_set_width(target2Label, 200);
   lv_obj_align(target2Label, LV_ALIGN_TOP_LEFT, 10, 170);  // Moved down from 160 to 170
   lv_obj_set_style_text_font(target2Label, &lv_font_montserrat_14, LV_PART_MAIN);
+  lv_obj_set_style_text_color(target2Label, lv_color_white(), LV_PART_MAIN);
   
   // Target2 MAC address
   lv_obj_t * target2MacLabel = lv_label_create(stored_devices_screen);
@@ -1112,6 +1119,7 @@ void create_stored_devices_screen() {
   lv_obj_set_width(target2MacLabel, 220);
   lv_obj_align(target2MacLabel, LV_ALIGN_TOP_LEFT, 10, 195);  // Moved down from 185 to 195
   lv_obj_set_style_text_font(target2MacLabel, &lv_font_montserrat_12, LV_PART_MAIN);
+  lv_obj_set_style_text_color(target2MacLabel, lv_color_white(), LV_PART_MAIN);
   
   // Target2 Status
   target2StatusLabel = lv_label_create(stored_devices_screen);
@@ -1140,10 +1148,14 @@ void create_stored_devices_screen() {
   lv_obj_center(lblDisconnectTarget2);
 }
 
-// Screen creation - Bluetooth Screen (UPDATED: Added Target1 button and Auto-connect checkbox)
+// Screen creation - Bluetooth Screen
 void create_bluetooth_screen() {
   bluetooth_screen = lv_obj_create(NULL);
   lv_obj_set_size(bluetooth_screen, SCREEN_WIDTH, SCREEN_HEIGHT);
+  
+  // Set background color to BLACK
+  lv_obj_set_style_bg_color(bluetooth_screen, lv_color_black(), LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(bluetooth_screen, LV_OPA_COVER, LV_PART_MAIN);
   
   // Title
   lv_obj_t * title = lv_label_create(bluetooth_screen);
@@ -1151,6 +1163,7 @@ void create_bluetooth_screen() {
   lv_obj_set_width(title, 300);
   lv_obj_set_style_text_font(title, &lv_font_montserrat_16, LV_PART_MAIN);
   lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_set_style_text_color(title, lv_color_white(), LV_PART_MAIN);
   lv_obj_align(title, LV_ALIGN_TOP_MID, 0, 10);
   
   // Device list - WIDE: 220px
@@ -1167,6 +1180,7 @@ void create_bluetooth_screen() {
   lv_obj_align(selectedDeviceLabel, LV_ALIGN_BOTTOM_MID, -30, -35);
   lv_obj_set_style_text_align(selectedDeviceLabel, LV_TEXT_ALIGN_CENTER, 0);
   lv_obj_set_style_text_font(selectedDeviceLabel, &lv_font_montserrat_12, LV_PART_MAIN);
+  lv_obj_set_style_text_color(selectedDeviceLabel, lv_color_white(), LV_PART_MAIN);
   
   // Connection status
   connectionStatusLabel = lv_label_create(bluetooth_screen);
@@ -1175,6 +1189,7 @@ void create_bluetooth_screen() {
   lv_obj_align(connectionStatusLabel, LV_ALIGN_BOTTOM_MID, -30, -10);
   lv_obj_set_style_text_font(connectionStatusLabel, &lv_font_montserrat_12, LV_PART_MAIN);
   lv_obj_set_style_text_align(connectionStatusLabel, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_set_style_text_color(connectionStatusLabel, lv_color_white(), LV_PART_MAIN);
   
   // Scan button
   lv_obj_t * btnScan = lv_button_create(bluetooth_screen);
@@ -1252,19 +1267,30 @@ void create_bluetooth_screen() {
 
 // Screen creation - Main Screen
 // Screen creation - Main Screen
-// Screen creation - Main Screen
 void create_main_screen() {
   main_screen = lv_screen_active();
   
-  // ADDED: Status indicator circle (10px diameter) at top right
+  // Set main screen background color to BLACK
+  lv_obj_set_style_bg_color(main_screen, lv_color_black(), LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(main_screen, LV_OPA_COVER, LV_PART_MAIN);
+  
+  // ADDED: Status indicator circle (20px diameter) at top right
   status_indicator = lv_obj_create(main_screen);
-  lv_obj_set_size(status_indicator, 10, 10);  // 10px diameter
-  lv_obj_set_style_radius(status_indicator, 5, LV_PART_MAIN);  // Make it circular
-  lv_obj_align(status_indicator, LV_ALIGN_TOP_RIGHT, -10, 10);  // 5px from top and right edges
-  // Initial color: Blue (not connected) - Using 0xFF0000 which is blue on your display
-  lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFF0000), LV_PART_MAIN);
+  lv_obj_set_size(status_indicator, 20, 20);  // 20px diameter
+  
+  // IMPORTANT: First set position, then apply styles
+  lv_obj_align(status_indicator, LV_ALIGN_TOP_RIGHT, -10, 10);  // 10px from top and right edges
+  
+  // Apply circle styling
+  lv_obj_set_style_radius(status_indicator, 10, LV_PART_MAIN);  // Half of 20px for perfect circle
+  lv_obj_set_style_bg_color(status_indicator, lv_color_hex(0xFF0000), LV_PART_MAIN); // RED when not connected
   lv_obj_set_style_bg_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_border_width(status_indicator, 0, LV_PART_MAIN);  // No border
+  lv_obj_set_style_border_width(status_indicator, 2, LV_PART_MAIN);
+  lv_obj_set_style_border_color(status_indicator, lv_color_white(), LV_PART_MAIN);
+  lv_obj_set_style_border_opa(status_indicator, LV_OPA_COVER, LV_PART_MAIN);
+  
+  // Remove any padding or default spacing
+  lv_obj_set_style_pad_all(status_indicator, 0, LV_PART_MAIN);
   
   // Settings button - moved down slightly to make room for status indicator
   lv_obj_t * btnSet = lv_button_create(main_screen);
@@ -1273,11 +1299,19 @@ void create_main_screen() {
   lv_obj_set_size(btnSet, 200, 40);
   // Set the text color to white
   lv_obj_set_style_text_color(btnSet, lv_color_white(), LV_PART_MAIN);
-  // Set the background color to green (0x0000FF on your display)
+  // Set the background color to RED (0x00FF00 on your display)
   lv_obj_set_style_bg_opa(btnSet, LV_OPA_COVER, LV_PART_MAIN);
-  lv_obj_set_style_bg_color(btnSet, lv_color_hex(0x0000FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_color(btnSet, lv_color_hex(0x00FF00), LV_PART_MAIN | LV_STATE_DEFAULT);
+  
+  // Add border to the title button (2px white border)
+  lv_obj_set_style_border_width(btnSet, 2, LV_PART_MAIN);
+  lv_obj_set_style_border_color(btnSet, lv_color_white(), LV_PART_MAIN);
+  lv_obj_set_style_border_opa(btnSet, LV_OPA_COVER, LV_PART_MAIN);
+  
   lv_obj_t * lblSet = lv_label_create(btnSet);
   lv_label_set_text(lblSet, "POV BLE Controller");
+  // Set font size 16 for the title button
+  lv_obj_set_style_text_font(lblSet, &lv_font_montserrat_16, LV_PART_MAIN);
   lv_obj_center(lblSet);
   
   // Relay buttons
@@ -1330,14 +1364,13 @@ void create_main_screen() {
   lv_obj_t * btn4 = create_relay_button("Relay4", event_handler_btn4, LV_ALIGN_CENTER, 80, 70);
 }
 
-
 void setup() {
   Serial.begin(115200);
   Serial.println("\n\n==========================================");
   Serial.println("       POV BLE CONTROLLER STARTING");
   Serial.println("==========================================");
   
-  // Load stored MACs from NVS
+  // Load stored MACs from NVS - CORRECT PLACE
   loadStoredMACs();
   
   // Load auto-connect state from NVS
